@@ -2,18 +2,16 @@ package s4.B183306; // Please modify to s4.Bnnnnnn, where nnnnnn is your student
 import	java.lang.*;
 import	s4.specification.*;
 /*package	s4.specification;
-public	interface	FrequencerInterface	{	//	This	interface	provides	the	design	for
-frequency	counter.
-			void	setTarget(byte		target[]);	//	set	the	data	to	search.
-				void	setSpace(byte		space[]);		//	set	the	data	to	be	searched	target	from.
-				int	frequency();	//It	return	-1,	when	TARGET	is	not	set	or	TARGET's	length	is	zero
-																				//Otherwise,	it	return	0,	when	SPACE	is	not	set	or	SPACE's	length
-is	zero
-																				//Otherwise,	get	the	frequency	of	TAGET	in	SPACE
+public	interface	FrequencerInterface	{	
+ //	This	interface	provides	the	design	for frequency	counter.
+    void	setTarget(byte		target[]);	//	set	the	data	to	search.
+    void	setSpace(byte		space[]);		//	set	the	data	to	be	searched	target	from.
+    int	frequency();	//It	return	-1,	when	TARGET	is	not	set	or	TARGET's	length	is	zero
+    //Otherwise,	it	return	0,	when	SPACE	is	not	set	or	SPACE's	length is	zero
+    //Otherwise,	get	the	frequency	of	TAGET	in	SPACE
 				int	subByteFrequency(int	start,	int	end);
-				//	get	the	frequency	of	subByte	of	taget,	i.e target[start],	taget[start+1],	...	,
-target[end-1].
-				//	For	the	incorrect	value	of	START	or	END,	the	behavior	is	undefined.
+    //	get	the	frequency	of	subByte	of	taget,	i.e target[start],	taget[start+1],	...	,target[end-1].
+        //	For	the	incorrect	value	of	START	or	END,	the	behavior	is	undefined.
 }
 */
 public	class	Frequencer	implements	FrequencerInterface{
@@ -95,8 +93,8 @@ public	class	Frequencer	implements	FrequencerInterface{
       //	****		Please	write	code	here...	***
       //
 
-        printSuffixArray();
-        System.out.println();
+        //printSuffixArray();
+        //System.out.println();
         //int test = suffixCompare(suffixArray[1],suffixArray[2]);
         //System.out.println(test);
         for(int i = 0; i < mySpace.length; i++){
@@ -127,11 +125,11 @@ public	class	Frequencer	implements	FrequencerInterface{
 
 
 
-    		private	int	targetCompare(int	i,	int	j,	int	end)	{
+    		private	int	targetCompare(int	i,	int	start,	int	end)	{
 								//	comparing	suffix_i	and	target_j_end	by	dictonary	order	with	limitation	of	length;
 								//	if	the	beginning	of	suffix_i	matches	target_i_end,	and	suffix	is	longer	than target		it	returns	0;
-								//	if	suffix_i	>	target_i_end	it	return	1;
-								//	if	suffix_i	<	target_i_end	it	return	-1
+								//	if	suffix_i	>	target_j_end	it	return	1;
+								//	if	suffix_i	<	target_j_end	it	return	-1
 								//	It	is	not	implemented	yet.
 								//	It	should	be	used	to	search	the	apropriate	index	of	some	suffix.
 								//	Example	of	search
@@ -148,8 +146,26 @@ public	class	Frequencer	implements	FrequencerInterface{
 								//
 								//	****		Please	write	code	here...	***
 								//
-								return	0;	//	This	line	should	be	modified.
-				}
+                int k = 0;
+                while(true){
+                    if(mySpace[suffixArray[i]+k] > myTarget[start]){
+                        return 1;
+                    }
+                    else if(mySpace[suffixArray[i]+k] < myTarget[start]){
+                        return -1;
+                    }
+                    else{
+                        start++;
+                        k++;
+                        if(start == end){
+                            return 0;
+                        }
+                        if(suffixArray[i]+k == mySpace.length){
+                            return -1;
+                        }
+                    }
+                }
+            }
 				private int	subByteStartIndex(int	start,	int	end)	{
 								//	It	returns	the	index	of	the	first	suffix	which	is	equal	or	greater	than	subBytes;
 								//	not	implemented	yet;
@@ -158,7 +174,15 @@ public	class	Frequencer	implements	FrequencerInterface{
 								//
 								//	****		Please	write	code	here...	***
 								//
-								return	suffixArray.length;	//	This	line	should	be	modified.
+                    int posi = 0;
+                    for(int i = 0;i < suffixArray.length;i++){
+                        posi = targetCompare(i,start,end);
+                        if(posi == 0){
+                            posi = i;
+                            return posi;
+                        }
+                    }
+                    return	-1;	//	This	line	should	be	modified.
 				}
 				private	int	subByteEndIndex(int	start,	int	end)	{
 								//	It	returns	the	next	index	of	the	first	suffix	which	is	greater	than	subBytes;
@@ -168,7 +192,23 @@ public	class	Frequencer	implements	FrequencerInterface{
 								//
 								//	****		Please	write	code	here...	***
 								//
-								return	suffixArray.length;	//	This	line	should	be	modified.
+                    int s_posi = subByteStartIndex(start,end);
+                    if(s_posi == -1){
+                        return s_posi;
+                    }
+                    if(s_posi == suffixArray.length - 1){
+                        return s_posi + 1;
+                    }
+                    for(int i = s_posi + 1;i < suffixArray.length;i++){
+                        s_posi = targetCompare(i,start,end);
+                        if(s_posi == 1){
+                            s_posi = i;
+                            return s_posi;
+                        }
+                        s_posi = i;
+                    }
+                    s_posi++;
+                    return s_posi;
 				}
 				public	int	subByteFrequency(int	start,	int	end)	{
 								/*	This	method	be	work	as	follows,	but
@@ -198,8 +238,8 @@ public	class	Frequencer	implements	FrequencerInterface{
 								Frequencer	frequencerObject;
 								try	{
 												frequencerObject	=	new	Frequencer();
-												//frequencerObject.setSpace("cab".getBytes());
-												frequencerObject.setSpace("Hi Ho Hi Ho".getBytes());
+												frequencerObject.setSpace("AAA".getBytes());
+												//frequencerObject.setSpace("Hi Ho Hi Ho".getBytes());
 												frequencerObject.printSuffixArray();	//	you	may	use	this	line	for	DEBUG
 												/*	Example	from	"Hi	Ho	Hi	Ho"
 															0:	Hi	Ho
@@ -216,13 +256,7 @@ public	class	Frequencer	implements	FrequencerInterface{
 												*/
 
 
-												frequencerObject.setTarget("H".getBytes());
-												/*
-												int x=0;
-												for(int i=0;i<10;i++){
-												x=frequencerObject.suffixCompare(i,i+1);
-												System.out.println(x);
-											}*/
+												frequencerObject.setTarget("A".getBytes());
 												//
 												//	****		Please	write	code	to	check	subByteStartIndex,	and	subByteEndIndex
 												//
